@@ -1,30 +1,35 @@
+import { Link } from 'react-router-dom'
+import { Users } from 'lucide-react'
 import FormAfericao from '../components/FormAfericao.jsx'
 import ListaAfericoes from '../components/ListaAfericoes.jsx'
+import Card from '../components/ui/Card.jsx'
+import EstadoVazio from '../components/ui/EstadoVazio.jsx'
 
 export default function Afericoes({
   paciente,
   afericoes,
   onSalvar,
   onRemover,
-  onIrPacientes,
 }) {
   if (!paciente) {
     return (
-      <section className="painel">
-        <h2>Selecione um paciente</h2>
-        <p>
-          Cada medição precisa de um perfil. Sem isso, os dados de pessoas
-          diferentes se misturam de novo.
-        </p>
-        <button type="button" className="botao-principal" onClick={onIrPacientes}>
-          Ir para pacientes
-        </button>
-      </section>
+      <Card className="painel">
+        <EstadoVazio
+          icone={Users}
+          titulo="Selecione um paciente"
+          texto="Cada medição precisa de um perfil. Sem isso, os dados de pessoas diferentes se misturam de novo."
+          acao={
+            <Link to="/pacientes" className="botao botao-principal">
+              Ir para pacientes
+            </Link>
+          }
+        />
+      </Card>
     )
   }
 
   return (
-    <section className="painel">
+    <Card className="painel">
       <p className="hint">
         Gravando em <strong>{paciente.nome}</strong>. Só as aferições deste
         id aparecem no histórico abaixo.
@@ -32,6 +37,6 @@ export default function Afericoes({
       <FormAfericao onSalvar={onSalvar} />
       <h2>Histórico deste paciente</h2>
       <ListaAfericoes afericoes={afericoes} onRemover={onRemover} />
-    </section>
+    </Card>
   )
 }

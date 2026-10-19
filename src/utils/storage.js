@@ -3,9 +3,21 @@ const STORAGE_ANTIGO = 'cardioia-afericoes'
 
 export function estadoVazio() {
   return {
+    usuarios: [],
+    sessaoUsuarioId: null,
     pacientes: [],
     pacienteAtualId: null,
     afericoes: [],
+  }
+}
+
+function normalizar(dados) {
+  return {
+    usuarios: dados.usuarios ?? [],
+    sessaoUsuarioId: dados.sessaoUsuarioId ?? null,
+    pacientes: dados.pacientes ?? [],
+    pacienteAtualId: dados.pacienteAtualId ?? null,
+    afericoes: dados.afericoes ?? [],
   }
 }
 
@@ -13,12 +25,7 @@ export function lerEstado() {
   try {
     const atual = localStorage.getItem(STORAGE_KEY)
     if (atual) {
-      const dados = JSON.parse(atual)
-      return {
-        pacientes: dados.pacientes ?? [],
-        pacienteAtualId: dados.pacienteAtualId ?? null,
-        afericoes: dados.afericoes ?? [],
-      }
+      return normalizar(JSON.parse(atual))
     }
 
     const antigo = localStorage.getItem(STORAGE_ANTIGO)
@@ -27,6 +34,7 @@ export function lerEstado() {
       if (Array.isArray(lista) && lista.length > 0) {
         const id = crypto.randomUUID()
         return {
+          ...estadoVazio(),
           pacientes: [
             {
               id,
@@ -52,5 +60,5 @@ export function lerEstado() {
 }
 
 export function salvarEstado(dados) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(dados))
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizar(dados)))
 }

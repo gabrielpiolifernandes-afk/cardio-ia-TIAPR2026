@@ -1,13 +1,30 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { UserPlus, UserRoundPen } from 'lucide-react'
+import Botao from './ui/Botao.jsx'
+import Campo from './ui/Campo.jsx'
 
 const formInicial = {
   nome: '',
   idade: '',
 }
 
-export default function FormPaciente({ onSalvar }) {
+export default function FormPaciente({ onSalvar, pacienteEdicao, onCancelar }) {
   const [form, setForm] = useState(formInicial)
   const [erro, setErro] = useState('')
+  const editando = Boolean(pacienteEdicao)
+
+  useEffect(() => {
+    if (pacienteEdicao) {
+      setForm({
+        nome: pacienteEdicao.nome,
+        idade: pacienteEdicao.idade ?? '',
+      })
+      setErro('')
+      return
+    }
+
+    setForm(formInicial)
+  }, [pacienteEdicao])
 
   function atualizarCampo(evento) {
     const { name, value } = evento.target
@@ -33,42 +50,46 @@ export default function FormPaciente({ onSalvar }) {
 
   return (
     <form className="formulario" onSubmit={handleSubmit}>
-      <h2>Novo paciente</h2>
+      <h2>{editando ? 'Editar paciente' : 'Novo paciente'}</h2>
       <p className="hint">
-        Sem login nesta etapa. Cada paciente é um perfil local, só neste
-        navegador. As aferições dele ficam isoladas das dos outros.
+        {editando
+          ? 'Altere nome ou idade. O id e as aferições deste perfil permanecem.'
+          : 'Cada paciente é um perfil local. As aferições dele ficam isoladas das dos outros.'}
       </p>
 
       <div className="grade-campos">
-        <label>
-          Nome
-          <input
-            name="nome"
-            type="text"
-            placeholder="Maria Silva"
-            value={form.nome}
-            onChange={atualizarCampo}
-          />
-        </label>
-        <label>
-          Idade (opcional)
-          <input
-            name="idade"
-            type="number"
-            min="1"
-            max="120"
-            placeholder="58"
-            value={form.idade}
-            onChange={atualizarCampo}
-          />
-        </label>
+        <Campo
+          label="Nome"
+          name="nome"
+          value={form.nome}
+          onChange={atualizarCampo}
+        />
+        <Campo
+          label="Idade (opcional)"
+          name="idade"
+          type="number"
+          min="1"
+          max="120"
+          value={form.idade}
+          onChange={atualizarCampo}
+        />
       </div>
 
-      {erro && <p className="erro">{erro}</p>}
+      {erro ? <p className="erro">{erro}</p> : null}
 
-      <button type="submit" className="botao-principal">
-        Cadastrar paciente
-      </button>
+      <div className="acoes-form">
+        {editando ? (
+          <Botao variante="fantasma" onClick={onCancelar}>
+            Cancelar
+          </Botao>
+        ) : null}
+        <Botao
+          type="submit"
+          icone={editando ? UserRoundPen : UserPlus}
+        >
+          {editando ? 'Salvar alterações' : 'Cadastrar paciente'}
+        </Botao>
+      </div>
     </form>
   )
 }
